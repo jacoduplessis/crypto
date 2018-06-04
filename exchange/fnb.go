@@ -1,12 +1,13 @@
 package exchange
 
 import (
-	"net/http"
-	"github.com/jacoduplessis/crypto/asset"
-	"github.com/PuerkitoBio/goquery"
 	"bytes"
+	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/jacoduplessis/crypto/asset"
 )
 
 type FNB struct {

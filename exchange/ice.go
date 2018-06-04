@@ -1,9 +1,10 @@
 package exchange
 
 import (
-	"net/http"
-	"github.com/jacoduplessis/crypto/asset"
 	"encoding/json"
+	"net/http"
+
+	"github.com/jacoduplessis/crypto/asset"
 )
 
 type ICE struct {
@@ -19,12 +20,12 @@ func (ice *ICE) Meta() *Meta {
 		API:  "https://ice3x.com/api/v1/",
 		Pairs: []*asset.Pair{
 			{Base: asset.Bitcoin, Quote: asset.Rand, Code: "3"},
-			//{Base: asset.Litecoin, Quote: asset.Rand, Code: "6"},
-			//{Base: asset.Ether, Quote: asset.Rand, Code: "11"},
-			//{Base: asset.Ether, Quote: asset.Bitcoin, Code: "13"},
-			//{Base: asset.Bitcoincash, Quote: asset.Bitcoin, Code: "14"},
-			//{Base: asset.Bitcoincash, Quote: asset.Rand, Code: "15"},
-			//{Base: asset.Litecoin, Quote: asset.Bitcoin, Code: "16"},
+			// {Base: asset.Litecoin, Quote: asset.Rand, Code: "6"},
+			// {Base: asset.Ether, Quote: asset.Rand, Code: "11"},
+			// {Base: asset.Ether, Quote: asset.Bitcoin, Code: "13"},
+			// {Base: asset.Bitcoincash, Quote: asset.Bitcoin, Code: "14"},
+			// {Base: asset.Bitcoincash, Quote: asset.Rand, Code: "15"},
+			// {Base: asset.Litecoin, Quote: asset.Bitcoin, Code: "16"},
 		},
 	}
 }

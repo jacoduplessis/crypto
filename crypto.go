@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/jacoduplessis/crypto/exchange"
 	"fmt"
-	"net/http"
 	"log"
+	"net/http"
+
+	"github.com/jacoduplessis/crypto/exchange"
 )
 
 func main() {

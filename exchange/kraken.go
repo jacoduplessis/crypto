@@ -1,12 +1,13 @@
 package exchange
 
 import (
-	"net/http"
-	"github.com/jacoduplessis/crypto/asset"
 	"encoding/json"
-	"github.com/pkg/errors"
+	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/jacoduplessis/crypto/asset"
+	"github.com/pkg/errors"
 )
 
 type Kraken struct {

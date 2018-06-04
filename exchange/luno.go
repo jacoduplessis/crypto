@@ -1,10 +1,11 @@
 package exchange
 
 import (
-	"github.com/jacoduplessis/crypto/asset"
 	"encoding/json"
-	"strconv"
 	"net/http"
+	"strconv"
+
+	"github.com/jacoduplessis/crypto/asset"
 )
 
 type Luno struct {
@@ -23,7 +24,6 @@ func (ln *Luno) Meta() *Meta {
 		},
 	}
 }
-
 
 func (ln *Luno) GetOrderBookRequest(pairCode string) (*http.Request, error) {
 
@@ -80,4 +80,3 @@ func (ln *Luno) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
 		Asks: asks,
 	}, nil
 }
-

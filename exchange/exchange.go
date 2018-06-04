@@ -1,12 +1,13 @@
 package exchange
 
 import (
-	"github.com/jacoduplessis/crypto/asset"
-	"net/http"
 	"io/ioutil"
-	"net/url"
 	"log"
+	"net/http"
+	"net/url"
 	"path"
+
+	"github.com/jacoduplessis/crypto/asset"
 )
 
 type Bids [][2]float64
