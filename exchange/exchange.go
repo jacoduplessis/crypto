@@ -1,7 +1,7 @@
 package exchange
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -23,7 +23,7 @@ type OrderBook struct {
 type Exchange interface {
 	Meta() *Meta
 	GetOrderBookRequest(string) (*http.Request, error)
-	ParseOrderBookResponse([]byte) (*OrderBook, error)
+	ParseOrderBookResponse(io.Reader) (*OrderBook, error)
 }
 
 type RequestConfig struct {
@@ -51,11 +51,7 @@ func GetOrderBook(client http.Client, exc Exchange, pair *asset.Pair) (*OrderBoo
 		return nil, err
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	ob, err := exc.ParseOrderBookResponse(b)
+	ob, err := exc.ParseOrderBookResponse(resp.Body)
 	if err != nil {
 		return nil, err
 	}

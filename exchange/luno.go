@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -31,7 +32,7 @@ func (ln *Luno) GetOrderBookRequest(pairCode string) (*http.Request, error) {
 	return http.NewRequest("GET", u, nil)
 }
 
-func (ln *Luno) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
+func (ln *Luno) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 
 	type Entry struct {
 		Volume string
@@ -43,7 +44,7 @@ func (ln *Luno) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
 		Asks []Entry
 	}
 
-	err := json.Unmarshal(b, &d)
+	err := json.NewDecoder(body).Decode(&d)
 	if err != nil {
 		return nil, err
 	}

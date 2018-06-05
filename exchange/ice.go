@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/jacoduplessis/crypto/asset"
@@ -35,7 +36,7 @@ func (ice *ICE) GetOrderBookRequest(pairCode string) (*http.Request, error) {
 	return http.NewRequest("GET", u, nil)
 }
 
-func (ice *ICE) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
+func (ice *ICE) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 
 	var d struct {
 		Response struct {
@@ -52,7 +53,7 @@ func (ice *ICE) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
 		}
 	}
 
-	err := json.Unmarshal(b, &d)
+	err := json.NewDecoder(body).Decode(&d)
 	if err != nil {
 		return nil, err
 	}

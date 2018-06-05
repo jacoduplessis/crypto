@@ -1,7 +1,7 @@
 package exchange
 
 import (
-	"bytes"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -29,9 +29,9 @@ func (fnb *FNB) GetOrderBookRequest(string) (*http.Request, error) {
 	return http.NewRequest("GET", u, nil)
 }
 
-func (fnb *FNB) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
+func (fnb *FNB) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(b))
+	doc, err := goquery.NewDocumentFromReader(body)
 	if err != nil {
 		return nil, err
 	}

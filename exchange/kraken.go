@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,7 +29,7 @@ func (kr *Kraken) Meta() *Meta {
 	}
 }
 
-func (kr *Kraken) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
+func (kr *Kraken) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 
 	type Data struct {
 		Asks [][2]string
@@ -39,7 +40,7 @@ func (kr *Kraken) ParseOrderBookResponse(b []byte) (*OrderBook, error) {
 		Result map[string]Data
 	}
 
-	err := json.Unmarshal(b, &d)
+	err := json.NewDecoder(body).Decode(&d)
 	if err != nil {
 		return nil, err
 	}
