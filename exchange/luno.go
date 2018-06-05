@@ -44,36 +44,36 @@ func (ln *Luno) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 		Asks []Entry
 	}
 
+	parse := func(responseEntries []Entry) ([][2]float64, error) {
+		entries := make([][2]float64, len(responseEntries))
+
+		for i, e := range responseEntries {
+			price, err := strconv.ParseFloat(e.Price, 64)
+			if err != nil {
+				return nil, err
+			}
+			volume, err := strconv.ParseFloat(e.Volume, 64)
+			if err != nil {
+				return nil, err
+			}
+			entries[i] = [2]float64{price, volume}
+		}
+
+		return entries, nil
+	}
+
 	err := json.NewDecoder(body).Decode(&d)
 	if err != nil {
 		return nil, err
 	}
 
-	bids := Bids{}
-	asks := Asks{}
-
-	for _, bid := range d.Bids {
-		price, err := strconv.ParseFloat(bid.Price, 64)
-		if err != nil {
-			return nil, err
-		}
-		volume, err := strconv.ParseFloat(bid.Volume, 64)
-		if err != nil {
-			return nil, err
-		}
-		bids = append(bids, [2]float64{price, volume})
+	bids, err := parse(d.Bids)
+	if err != nil {
+		return nil, err
 	}
-
-	for _, ask := range d.Asks {
-		price, err := strconv.ParseFloat(ask.Price, 64)
-		if err != nil {
-			return nil, err
-		}
-		volume, err := strconv.ParseFloat(ask.Volume, 64)
-		if err != nil {
-			return nil, err
-		}
-		asks = append(asks, [2]float64{price, volume})
+	asks, err := parse(d.Asks)
+	if err != nil {
+		return nil, err
 	}
 
 	return &OrderBook{

@@ -37,6 +37,24 @@ func (kr *Kraken) Meta() *Meta {
 
 func (kr *Kraken) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 
+	parse := func(responseEntries [][2]string) ([][2]float64, error) {
+		entries := make([][2]float64, len(responseEntries))
+
+		for i, e := range responseEntries {
+			price, err := strconv.ParseFloat(e[0], 64)
+			if err != nil {
+				return nil, err
+			}
+			volume, err := strconv.ParseFloat(e[1], 64)
+			if err != nil {
+				return nil, err
+			}
+			entries[i] = [2]float64{price, volume}
+		}
+
+		return entries, nil
+	}
+
 	type Data struct {
 		Asks [][2]string
 		Bids [][2]string
@@ -54,9 +72,6 @@ func (kr *Kraken) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 		return nil, errors.New(strings.Join(d.Errors, ","))
 	}
 
-	bids := Bids{}
-	asks := Asks{}
-
 	var data Data
 
 	for _, v := range d.Result {
@@ -64,28 +79,13 @@ func (kr *Kraken) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 		break
 	}
 
-	for _, bid := range data.Bids {
-		price, err := strconv.ParseFloat(bid[0], 64)
-		if err != nil {
-			return nil, err
-		}
-		volume, err := strconv.ParseFloat(bid[1], 64)
-		if err != nil {
-			return nil, err
-		}
-		bids = append(bids, [2]float64{price, volume})
+	bids, err := parse(data.Bids)
+	if err != nil {
+		return nil, err
 	}
-
-	for _, ask := range data.Asks {
-		price, err := strconv.ParseFloat(ask[0], 64)
-		if err != nil {
-			return nil, err
-		}
-		volume, err := strconv.ParseFloat(ask[1], 64)
-		if err != nil {
-			return nil, err
-		}
-		asks = append(asks, [2]float64{price, volume})
+	asks, err := parse(data.Asks)
+	if err != nil {
+		return nil, err
 	}
 
 	return &OrderBook{
