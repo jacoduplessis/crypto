@@ -24,7 +24,13 @@ func (kr *Kraken) Meta() *Meta {
 		Pairs: []*asset.Pair{
 			{Base: asset.Bitcoin, Quote: asset.Euro, Code: "XXBTZEUR"},
 			{Base: asset.Ripple, Quote: asset.Euro, Code: "XXRPZEUR"},
+			{Base: asset.Ripple, Quote: asset.Bitcoin, Code: "XXRPXXBT"},
 			{Base: asset.Litecoin, Quote: asset.Euro, Code: "XLTCZEUR"},
+			{Base: asset.Litecoin, Quote: asset.Bitcoin, Code: "XLTCXXBT"},
+			{Base: asset.Bitcoincash, Quote: asset.Euro, Code: "BCHEUR"},
+			{Base: asset.Bitcoincash, Quote: asset.Bitcoin, Code: "BCHXBT"},
+			{Base: asset.Ether, Quote: asset.Euro, Code: "XETHZEUR"},
+			{Base: asset.Ether, Quote: asset.Bitcoin, Code: "XETHXXBT"},
 		},
 	}
 }
