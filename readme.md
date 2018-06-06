@@ -8,3 +8,8 @@ Currently supports limited order book retrieval for:
 - FNB
 - Kraken
 - ICE3x
+- AltCoinTrader
+
+If you want to use AltCoinTrader, use the included HTTP transport to
+bypass the CloudFlare protection. See `example.go` for an example.
+

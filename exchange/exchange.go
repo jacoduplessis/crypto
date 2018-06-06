@@ -40,6 +40,7 @@ type Meta struct {
 	URL   string
 }
 
+// GetOrderBook fetches a single trading pair on an exchange.
 func GetOrderBook(client http.Client, exc Exchange, pair *asset.Pair) (*OrderBook, error) {
 
 	req, err := exc.GetOrderBookRequest(pair.Code)
@@ -59,6 +60,7 @@ func GetOrderBook(client http.Client, exc Exchange, pair *asset.Pair) (*OrderBoo
 	return ob, nil
 }
 
+// GetOrderBooks fetches all trading pairs for the provided exchanges concurrently.
 func GetOrderBooks(client http.Client, exchanges ...Exchange) ([]*OrderBook, error) {
 	var obs []*OrderBook
 	numPairs := 0
@@ -98,6 +100,8 @@ func GetOrderBooks(client http.Client, exchanges ...Exchange) ([]*OrderBook, err
 	return obs, nil
 }
 
+// Build is a helper function to build a complete URL for an exchange.
+// It accepts a path and query parameters.
 func Build(e Exchange, p string, params map[string]string) string {
 	u, err := url.Parse(e.Meta().API)
 	if err != nil {
