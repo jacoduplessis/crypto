@@ -58,8 +58,8 @@ func (ice *ICE) ParseOrderBookResponse(body io.Reader) (*OrderBook, error) {
 		return nil, err
 	}
 
-	var bids Bids
-	var asks Asks
+	var bids [][2]float64
+	var asks [][2]float64
 
 	for _, bid := range d.Response.Entities.Bids {
 		bids = append(bids, [2]float64{bid.Price, bid.Amount})
