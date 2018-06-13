@@ -5,8 +5,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-
-	"github.com/jacoduplessis/crypto/asset"
 )
 
 type Luno struct {
@@ -19,9 +17,9 @@ func (ln *Luno) Meta() *Meta {
 		Name: "Luno",
 		Slug: "luno",
 		API:  "https://api.mybitx.com/api/1/",
-		Pairs: []*asset.Pair{
-			{Base: asset.Bitcoin, Quote: asset.Rand, Code: "XBTZAR"},
-			{Base: asset.Ether, Quote: asset.Bitcoin, Code: "ETHXBT"},
+		Pairs: []*Pair{
+			{Base: Bitcoin, Quote: Rand, Code: "XBTZAR"},
+			{Base: Ether, Quote: Bitcoin, Code: "ETHXBT"},
 		},
 	}
 }

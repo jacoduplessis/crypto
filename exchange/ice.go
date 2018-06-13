@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"github.com/jacoduplessis/crypto/asset"
 )
 
 type ICE struct {
@@ -19,14 +17,14 @@ func (ice *ICE) Meta() *Meta {
 		Name: "ICE",
 		Slug: "ice",
 		API:  "https://ice3x.com/api/v1/",
-		Pairs: []*asset.Pair{
-			{Base: asset.Bitcoin, Quote: asset.Rand, Code: "3"},
-			// {Base: asset.Litecoin, Quote: asset.Rand, Code: "6"},
-			// {Base: asset.Ether, Quote: asset.Rand, Code: "11"},
-			// {Base: asset.Ether, Quote: asset.Bitcoin, Code: "13"},
-			// {Base: asset.Bitcoincash, Quote: asset.Bitcoin, Code: "14"},
-			// {Base: asset.Bitcoincash, Quote: asset.Rand, Code: "15"},
-			// {Base: asset.Litecoin, Quote: asset.Bitcoin, Code: "16"},
+		Pairs: []*Pair{
+			{Base: Bitcoin, Quote: Rand, Code: "3"},
+			{Base: Litecoin, Quote: Rand, Code: "6"},
+			{Base: Ether, Quote: Rand, Code: "11"},
+			{Base: Ether, Quote: Bitcoin, Code: "13"},
+			{Base: Bitcoincash, Quote: Bitcoin, Code: "14"},
+			{Base: Bitcoincash, Quote: Rand, Code: "15"},
+			{Base: Litecoin, Quote: Bitcoin, Code: "16"},
 		},
 	}
 }

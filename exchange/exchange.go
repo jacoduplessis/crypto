@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-
-	"github.com/jacoduplessis/crypto/asset"
 )
 
 type OrderType bool
@@ -23,8 +21,8 @@ const (
 type OrderBook struct {
 	Bids     [][2]float64
 	Asks     [][2]float64
-	Pair     *asset.Pair
-	Exchange *Exchange
+	Pair     *Pair
+	Exchange Exchange
 }
 
 // 0 - price
@@ -52,13 +50,13 @@ type RequestConfig struct {
 type Meta struct {
 	Name  string
 	Slug  string
-	Pairs []*asset.Pair
+	Pairs []*Pair
 	API   string
 	URL   string
 }
 
 // GetOrderBook fetches a single trading pair on an exchange.
-func GetOrderBook(client http.Client, exc Exchange, pair *asset.Pair) (*OrderBook, error) {
+func GetOrderBook(client http.Client, exc Exchange, pair *Pair) (*OrderBook, error) {
 
 	req, err := exc.GetOrderBookRequest(pair.Code)
 	if err != nil {
@@ -81,7 +79,7 @@ func GetOrderBook(client http.Client, exc Exchange, pair *asset.Pair) (*OrderBoo
 func GetOrderBooks(client http.Client, exchanges ...Exchange) ([]*OrderBook, error) {
 	var obs []*OrderBook
 	numPairs := 0
-	exchangePairs := map[Exchange][]*asset.Pair{}
+	exchangePairs := map[Exchange][]*Pair{}
 	for _, e := range exchanges {
 		p := e.Meta().Pairs
 		numPairs += len(p)
@@ -93,13 +91,13 @@ func GetOrderBooks(client http.Client, exchanges ...Exchange) ([]*OrderBook, err
 	for exchange, pairs := range exchangePairs {
 
 		for _, pair := range pairs {
-			go func(e Exchange, p *asset.Pair) {
+			go func(e Exchange, p *Pair) {
 				ob, err := GetOrderBook(client, e, p)
 				if err != nil {
 					errors <- err
 					return
 				}
-				ob.Exchange = &e
+				ob.Exchange = e
 				results <- ob
 			}(exchange, pair)
 		}
@@ -171,7 +169,7 @@ type Trade struct {
 	Amount    float64
 	Type      OrderType
 	Quote     bool
-	Pair      *asset.Pair
+	Pair      *Pair
 }
 
 type TradeResult struct {
@@ -180,7 +178,30 @@ type TradeResult struct {
 	Nett      float64
 	GrossUnit float64
 	NettUnit  float64
-	Asset     *asset.Asset
+	Asset     *Asset
+}
+
+type Route struct {
+	Legs []*RouteLeg
+}
+
+type RouteLeg struct {
+	Pair      *Pair
+	OrderBook *PreparedOrderBook
+	Exchange  Exchange
+}
+
+type RouteRequest struct {
+	Pair   *Pair
+	Volume float64
+	Type   OrderType
+}
+
+type RouteResult struct {
+	Amount      float64
+	Asset       *Asset
+	Description string
+	Requests    []*RouteRequest
 }
 
 func (t *Trade) Simulate() (*TradeResult, error) {
@@ -189,7 +210,7 @@ func (t *Trade) Simulate() (*TradeResult, error) {
 		gross     float64
 		cumVolume float64
 		cumValue  float64
-		ass       *asset.Asset
+		ass       *Asset
 		fee       float64
 		entries   [][5]float64
 	)
@@ -258,4 +279,67 @@ func (t *Trade) Simulate() (*TradeResult, error) {
 		Asset:     ass,
 	}, nil
 
+}
+
+func (r *Route) Simulate(asset *Asset, amount float64) (*RouteResult, error) {
+
+	var (
+		description string
+		requests    []*RouteRequest
+	)
+
+	for i, leg := range r.Legs {
+
+		var ot OrderType
+
+		switch asset {
+		case leg.Pair.Quote:
+			ot = BUY
+		case leg.Pair.Base:
+			ot = SELL
+		default:
+			return nil, fmt.Errorf("Invalid asset \"%s\" for simulation: must be \"%s\" or \"%s\"", asset.Slug, leg.Pair.Base.Slug, leg.Pair.Quote.Slug)
+		}
+
+		t := &Trade{Pair: leg.Pair, OrderBook: leg.OrderBook, Type: ot}
+		res, err := t.Simulate()
+		if err != nil {
+			return nil, err
+		}
+		if ot == BUY {
+			description += fmt.Sprintf("\nTRADE: buy %.4f %s on %s for %.4f %s (%.4f fee)",
+				res.Gross, res.Asset.Slug, leg.Exchange.Meta().Slug, amount, asset, res.Fee)
+			requests = append(requests, &RouteRequest{Pair: leg.Pair, Volume: res.Gross, Type: BUY})
+		} else {
+			description += fmt.Sprintf("\nTRADE: sell %.f %s on %s for %.4f %s (%.4f fee)",
+				amount, asset, leg.Exchange.Meta().Slug, res.Gross, res.Asset.Slug, res.Fee)
+			requests = append(requests, &RouteRequest{Pair: leg.Pair, Volume: amount, Type: SELL})
+		}
+
+		amount = res.Nett
+		asset = res.Asset
+
+		description += fmt.Sprintf("\nHOLDING: %.4f %s", amount, asset.Slug)
+
+		if i+1 < len(r.Legs) {
+
+			nextExchange := r.Legs[i+1].Exchange
+			if nextExchange != leg.Exchange {
+
+				withdrawalFee := 0.0 // TODO: implement exchange.calculate_withdrawal_fee(asset, amount)
+				depositFee := 0.0    // TODO: implement nextExchange.calculate_deposit_fee(asset, amount - withdrawal_fee)
+
+				description += fmt.Sprintf("FEE: %.4f %s withdrawal fee at %s", withdrawalFee, asset, leg.Exchange.Meta().Slug)
+				description += fmt.Sprintf("FEE: %.4f %s deposit fee at %s", depositFee, asset, nextExchange.Meta().Slug)
+
+				amount = amount - withdrawalFee - depositFee
+				description += fmt.Sprintf("HOLDING: %.4f %s", amount, asset)
+			}
+
+		} else {
+			description += "DONE"
+		}
+	}
+
+	return &RouteResult{Amount: amount, Asset: asset, Description: description, Requests: requests}, nil
 }

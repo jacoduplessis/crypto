@@ -1,4 +1,4 @@
-package asset
+package exchange
 
 type Pair struct {
 	Base          *Asset

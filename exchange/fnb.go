@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/jacoduplessis/crypto/asset"
 )
 
 type FNB struct {
@@ -18,8 +17,8 @@ func (fnb *FNB) Meta() *Meta {
 		Name: "FNB",
 		Slug: "fnb",
 		API:  "https://www.fnb.co.za/",
-		Pairs: []*asset.Pair{
-			{Base: asset.Ether, Quote: asset.Ripple, Code: "EURZAR"},
+		Pairs: []*Pair{
+			{Base: Euro, Quote: Rand, Code: "EURZAR"},
 		},
 	}
 }

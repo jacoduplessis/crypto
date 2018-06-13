@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/jacoduplessis/crypto/asset"
 )
 
 type AltCoinTrader struct {
@@ -19,9 +18,9 @@ func (alt *AltCoinTrader) Meta() *Meta {
 		Name: "AltCoinTrader",
 		Slug: "alt",
 		API:  "https://www.altcointrader.co.za",
-		Pairs: []*asset.Pair{
-			{Base: asset.Bitcoin, Quote: asset.Rand, Code: "/"},
-			{Base: asset.Ripple, Quote: asset.Rand, Code: "/xrp"},
+		Pairs: []*Pair{
+			{Base: Bitcoin, Quote: Rand, Code: "/"},
+			{Base: Ripple, Quote: Rand, Code: "/xrp"},
 		},
 	}
 }
